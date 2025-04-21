@@ -1,0 +1,7 @@
+package com.platform.platform.repo;
+
+import com.platform.platform.entity.RelatedCourse;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RelatedCourseRepository extends JpaRepository<RelatedCourse, Integer> {
+}

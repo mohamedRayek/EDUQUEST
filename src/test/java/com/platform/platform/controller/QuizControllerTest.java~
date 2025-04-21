@@ -1,0 +1,110 @@
+package com.platform.platform.controller;
+
+import com.platform.platform.Services.QuizService;
+import com.platform.platform.entity.Question;
+import com.platform.platform.entity.Quiz;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.Collections;
+
+@WebMvcTest(QuizController.class)
+public class QuizControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private QuizService quizService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private Quiz quiz;
+    private Question question;
+
+    @BeforeEach
+    void setUp() {
+        quiz = new Quiz();
+        quiz.setId(1);
+        quiz.setName("Java Basics");
+        quiz.setSubject("Java");
+
+        question = new Question();
+        question.setId(1);
+        question.setQuestion("What is Java?");
+    }
+
+    @Test
+    void testCreateNewQuiz() throws Exception {
+        Mockito.when(quizService.createNewQuiz("Java Basics", "Java")).thenReturn(quiz);
+
+        mockMvc.perform(post("/quizzes/create")
+                .param("name", "Java Basics")
+                .param("subject", "Java"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Java Basics"))
+                .andExpect(jsonPath("$.subject").value("Java"));
+    }
+
+    @Test
+    void testGetActiveQuiz() throws Exception {
+        Mockito.when(quizService.getActiveQuiz()).thenReturn(quiz);
+
+        mockMvc.perform(get("/quizzes/active"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Java Basics"));
+    }
+
+    @Test
+    void testAddQuestionToActiveQuiz() throws Exception {
+        Mockito.when(quizService.addQuestionToActiveQuiz(Mockito.any())).thenReturn(question);
+
+        mockMvc.perform(post("/quizzes/questions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(question)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.text").value("What is Java?"));
+    }
+
+    @Test
+    void testDeleteQuestionFromActiveQuiz() throws Exception {
+        mockMvc.perform(delete("/quizzes/questions/1"))
+                .andExpect(status().isOk());
+
+        Mockito.verify(quizService).deleteQuestionFromActiveQuiz(1);
+    }
+
+    @Test
+    void testUpdateQuestionInActiveQuiz() throws Exception {
+        Question updatedQuestion = new Question();
+        updatedQuestion.setId(1);
+        updatedQuestion.setText("Updated Question");
+
+        Mockito.when(quizService.updateQuestionInActiveQuiz(Mockito.eq(1), Mockito.any())).thenReturn(updatedQuestion);
+
+        mockMvc.perform(put("/quizzes/questions/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedQuestion)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.text").value("Updated Question"));
+    }
+
+    @Test
+    void testGetQuestionsInActiveQuiz() throws Exception {
+        Mockito.when(quizService.getQuestionsInActiveQuiz()).thenReturn(Collections.singletonList(question));
+
+        mockMvc.perform(get("/quizzes/questions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].text").value("What is Java?"));
+    }
+}

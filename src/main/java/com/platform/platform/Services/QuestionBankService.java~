@@ -1,0 +1,29 @@
+package com.platform.platform.Services;
+
+import com.platform.platform.entity.QuestionBank;
+import com.platform.platform.entity.dto.QuestionBankDTO;
+import com.platform.platform.entity.dto.QuestionBankDTOMapper;
+import com.platform.platform.repo.QuestionBankRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class QuestionBankService {
+
+    @Autowired
+    private QuestionBankRepository questionBankRepository;
+
+    @Autowired
+   private final QuestionBankDTOMapper questionBankDTOMapper;
+
+    public List<QuestionBankDTO> getQuestionBanksBySubject(String subject) {
+        return questionBankRepository.findBySubject(subject)
+                .stream()
+                .map(questionBankDTOMapper)
+                .collect(Collectors.toList());
+    }
+
+}
