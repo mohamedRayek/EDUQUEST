@@ -110,4 +110,10 @@ public class Course {
     //@JsonIgnore
     private List<Quiz> quizzes;
 
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<Rating> ratings;
+
+    @OneToOne(mappedBy = "course", cascade = CascadeType.ALL)
+    private RatingDistribution ratingDistribution;
+
 }

@@ -23,7 +23,11 @@ public record CourseDTO(
         float rate,
         @Column(name = "goals", length = 2000)
         @Convert(converter = StringListConverter.class)
-        List<String> goals
+        List<String> goals,
+        List<VideoDTO> videos,
+        List<ImageDTO> images,
+        List<FileDTO> files
+
 
 ) {
 

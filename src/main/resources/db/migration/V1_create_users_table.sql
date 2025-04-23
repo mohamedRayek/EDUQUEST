@@ -99,3 +99,28 @@ CREATE TABLE quiz_student (
                               FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE
 );
 
+CREATE TABLE rating_distribution (
+                                     id INT AUTO_INCREMENT PRIMARY KEY,
+                                     one_stars INTEGER DEFAULT 0,
+                                     two_stars INTEGER DEFAULT 0,
+                                     three_stars INTEGER DEFAULT 0,
+                                     four_stars INTEGER DEFAULT 0,
+                                     five_stars INTEGER DEFAULT 0,
+                                     course_id INTEGER UNIQUE,
+                                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                     FOREIGN KEY (course_id) REFERENCES course(id)
+);
+
+CREATE TABLE rating (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        stars INT NOT NULL CHECK (stars BETWEEN 1 AND 5),
+                        student_id INT NOT NULL,
+                        course_id INT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (student_id) REFERENCES student(student_id),
+                        FOREIGN KEY (course_id) REFERENCES course(course_id),
+                        CONSTRAINT uc_rating_student_course UNIQUE (student_id, course_id)
+);
+
+
+

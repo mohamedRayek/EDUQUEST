@@ -3,6 +3,8 @@ package com.platform.platform.controller;
 import com.platform.platform.Services.CourseService;
 import com.platform.platform.Services.FileUploadUtil;
 //import com.platform.platform.config.CustomUserDetails;
+import com.platform.platform.Services.RatingService;
+import com.platform.platform.config.CustomUserDetails;
 import com.platform.platform.entity.*;
 import com.platform.platform.entity.dto.CourseDTO;
 import com.platform.platform.repo.CourseRepository;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.core.Authentication;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ws.schild.jave.MultimediaInfo;
@@ -43,6 +46,8 @@ public class CourseController {
 
     @Autowired
     private CourseService courseService;
+
+    private final RatingService ratingService;
 
     private final CourseRepository courseRepository;
 
@@ -179,19 +184,41 @@ public class CourseController {
     }
 
     // Search courses by subject (limit 5 and not owned by current teacher)
-//    @GetMapping("/search")
-//    public ResponseEntity<List<Course>> searchCoursesBySubject(
-//            @RequestParam String subject,
-//            Authentication authentication) {
-//
-//        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-//        Integer currentTeacherId = userDetails.getUserId();
-//
-//        Pageable limit = PageRequest.of(0, 5);
-//        List<Course> courses = courseRepository
-//                .findBySubjectContainingIgnoreCaseAndTeacherIdNot(subject, currentTeacherId, limit)
-//                .getContent();
-//
-//        return ResponseEntity.ok(courses);
-//    }
+    @GetMapping("/search")
+    public ResponseEntity<List<Course>> searchCoursesBySubject(
+            @RequestParam String subject,
+            Authentication authentication) {
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Integer currentTeacherId = userDetails.getUserId();
+
+        Pageable limit = PageRequest.of(0, 5);
+        List<Course> courses = courseRepository
+                .findBySubjectContainingIgnoreCaseAndTeacherIdNot(subject, currentTeacherId, limit)
+                .getContent();
+
+        return ResponseEntity.ok(courses);
+    }
+
+
+
+    @PostMapping("/ratings/{courseId}/rate")
+    public ResponseEntity<Rating> rateCourse(
+            @PathVariable Integer courseId,
+            @RequestParam Integer studentId,
+            @RequestParam Integer stars) {
+        Rating rating = ratingService.addRating(courseId, studentId, stars);
+        return ResponseEntity.ok(rating);
+    }
+
+    @GetMapping("/ratings/{courseId}/distribution")
+    public ResponseEntity<RatingDistribution> getRatingDistribution(@PathVariable Integer courseId) {
+        RatingDistribution distribution = ratingService.getRatingDistribution(courseId);
+        return ResponseEntity.ok(distribution);
+    }
+
+
+
+
+
 }

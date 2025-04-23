@@ -2,25 +2,26 @@ package com.platform.platform;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-//import org.springframework.context.annotation.Import;
-//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.util.Base64;
 
 @SpringBootApplication
-//@EnableWebSecurity
+@EnableWebSecurity
 public class PlatformApplication {
 
 	public static void main(String[] args) {
 
 		// هذه الدالة مؤقتة لإنشاء المفتاح
-//        try {
-//            generateJwtSecretKey();
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            generateJwtSecretKey();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         SpringApplication.run(PlatformApplication.class, args);
 
